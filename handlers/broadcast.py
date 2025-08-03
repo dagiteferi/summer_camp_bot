@@ -1,7 +1,7 @@
 
 from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler
-from bot.constants import BROADCAST_MESSAGE
+from src.constants import BROADCAST_MESSAGE
 
 async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Start broadcast message process."""

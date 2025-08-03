@@ -1,3 +1,4 @@
+
 from telegram import Update
 from telegram.ext import ContextTypes
 
@@ -33,7 +34,7 @@ async def add_admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         new_admin_id = int(context.args[0])
-        if await admin_service.add_admin(new_admin_id):
+        if admin_service.add_admin(new_admin_id):
             await update.message.reply_text(f"Admin {new_admin_id} added successfully.")
             for admin_id in admin_service.get_admins():
                 if admin_id != update.message.from_user.id:
@@ -55,7 +56,7 @@ async def remove_admin_command(update: Update, context: ContextTypes.DEFAULT_TYP
 
     try:
         admin_to_remove_id = int(context.args[0])
-        if await admin_service.remove_admin(admin_to_remove_id):
+        if admin_service.remove_admin(admin_to_remove_id):
             await update.message.reply_text(f"Admin {admin_to_remove_id} removed successfully.")
             for admin_id in admin_service.get_admins():
                 if admin_id != update.message.from_user.id:

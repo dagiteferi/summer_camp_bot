@@ -1,7 +1,5 @@
-
 import os
 import logging
-import asyncio
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -11,13 +9,13 @@ from telegram.ext import (
 )
 from dotenv import load_dotenv
 
-from bot.constants import (
+from src.constants import (
     REGISTER_NAME, REGISTER_FATHER_NAME, REGISTER_PHONE, REGISTER_EDUCATION,
     REGISTER_OTHER_EDUCATION, REGISTER_DEPARTMENT, REGISTER_USERNAME, REGISTER_ROUND,
     BROADCAST_MESSAGE
 )
-from bot.services.admin_service import AdminService
-from bot.services.sheet_service import SheetService
+from src.services.admin_service import AdminService
+from src.services.sheet_service import SheetService
 from handlers.start import start
 from handlers.registration import (
     registration_name, registration_father_name, registration_phone, registration_education,
@@ -36,11 +34,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-async def main():
+def main():
     """Main function to run the Telegram bot."""
+    # Load environment variables
+    load_dotenv()
+
     # Initialize services
     admin_service = AdminService()
-    await admin_service.load_admins()
+    admin_service.load_admins()
     sheet_service = SheetService(GOOGLE_SHEETS_CREDENTIALS, SHEET_ID)
 
     # Create the Application and pass it your bot's token.
@@ -91,8 +92,7 @@ async def main():
     application.add_error_handler(error_handler)
 
     # Start the bot
-    await application.run_polling(allowed_updates=["message", "callback_query"])
+    application.run_polling(allowed_updates=["message", "callback_query"])
 
 if __name__ == "__main__":
-    load_dotenv()
-    asyncio.run(main())
+    main()

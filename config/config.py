@@ -10,7 +10,8 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 GOOGLE_SHEETS_CREDENTIALS = os.getenv("GOOGLE_SHEETS_CREDENTIALS")  # Path to JSON key file
 SHEET_ID = os.getenv("SHEET_ID")  # Google Sheet ID
 
-
+# Active round
+ACTIVE_ROUND = "Round 1"
 
 # Bot Messages
 WELCOME_MESSAGE = """
