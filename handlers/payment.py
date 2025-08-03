@@ -33,8 +33,8 @@ async def payment_approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
         batch_number = generate_batch_number()
         if sheet_service.update_payment_and_membership_status(user_id_to_approve, "Approved", "Approved", batch_number):
             await context.bot.send_message(
-                user_id_to_approve,
-                SUCCESS_MESSAGE.format(batch_number=batch_number)
+                chat_id=user_id_to_approve,
+                text=SUCCESS_MESSAGE.format(batch_number=batch_number)
             )
             await update.message.reply_text(f"Payment and membership approved for {user_id_to_approve}. Batch: {batch_number}")
         else:

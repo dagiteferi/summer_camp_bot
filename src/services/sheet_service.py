@@ -3,6 +3,7 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
 from src.constants import COLUMNS
+from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type
 
 class SheetService:
     def __init__(self, credentials_path, sheet_id):
@@ -18,8 +19,10 @@ class SheetService:
         if header != COLUMNS:
             self.sheet.insert_row(COLUMNS, 1)
 
+    @retry(wait=wait_exponential(multiplier=1, min=4, max=10), stop=stop_after_attempt(5),
+           retry=retry_if_exception_type((gspread.exceptions.APIError, gspread.exceptions.GSpreadException)))
     def save_registration(self, data):
-        """Save a new registration to the sheet."""
+        """Save a new registration to the sheet with retry logic."""
         row = [
             data["name"],
             data["father_name"],
