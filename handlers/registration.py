@@ -1,12 +1,12 @@
+
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import ContextTypes, ConversationHandler
 from utils.validators import validate_name, validate_phone
 from config.config import PAYMENT_INSTRUCTIONS, PENDING_MESSAGE
-from utils.sheets import save_registration
-
-# States for conversation
-(REGISTER_NAME, REGISTER_FATHER_NAME, REGISTER_PHONE, REGISTER_EDUCATION,
- REGISTER_OTHER_EDUCATION, REGISTER_DEPARTMENT, REGISTER_USERNAME, REGISTER_ROUND) = range(8)
+from bot.constants import (
+    REGISTER_NAME, REGISTER_FATHER_NAME, REGISTER_PHONE, REGISTER_EDUCATION,
+    REGISTER_OTHER_EDUCATION, REGISTER_DEPARTMENT, REGISTER_USERNAME, REGISTER_ROUND
+)
 
 async def registration_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Start registration and ask for name."""
@@ -91,11 +91,9 @@ async def registration_username(update: Update, context: ContextTypes.DEFAULT_TY
 
 async def registration_round(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle round selection and prompt for payment."""
-    context.user_data["registration"]["round"] = update.message.text.split(" ")[0]  # Extract "Round 1" or "Round 2"
-    context.user_data["registration"]["payment_status"] = "Pending"
-    context.user_data["registration"]["membership_status"] = "Pending"
-    context.user_data["registration"]["batch_number"] = ""
-    save_registration(context.user_data["registration"])
+    sheet_service = context.bot_data["sheet_service"]
+    context.user_data["registration"]["round"] = update.message.text.split(" ")[0]
+    sheet_service.save_registration(context.user_data["registration"])
     await context.bot.send_message(
         chat_id=update.message.from_user.id,
         text=PENDING_MESSAGE

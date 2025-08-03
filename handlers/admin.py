@@ -1,35 +1,41 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from utils.sheets import get_registrations
-from utils.admin_utils import is_admin, add_admin, remove_admin, get_admins
 
 async def admin_view(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Admin command to view registrations."""
-    if not is_admin(update.message.from_user.id):
+    admin_service = context.bot_data["admin_service"]
+    if not admin_service.is_admin(update.message.from_user.id):
         await update.message.reply_text("Unauthorized.")
         return
+
+    sheet_service = context.bot_data["sheet_service"]
     round_filter = context.args[0] if context.args else None
-    registrations = get_registrations(round_filter)
+    registrations = sheet_service.get_registrations(round_filter)
+
     if not registrations:
         await update.message.reply_text("No registrations found.")
         return
+
     message = f"Registrations ({'All' if not round_filter else round_filter}):\n"
     for r in registrations:
-        message += (f"Name: {r['Name']}, Phone: {r['Phone Number']}, "
-                   f"Round: {r['Round']}, Payment: {r['Payment Status']}, Membership: {r['Membership Status']}\n")
+        message += (
+            f"Name: {r['Name']}, Phone: {r['Phone Number']}, "
+            f"Round: {r['Round']}, Payment: {r['Payment Status']}, Membership: {r['Membership Status']}\n"
+        )
     await update.message.reply_text(message)
 
 async def add_admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Command to add a new admin."""
-    if not is_admin(update.message.from_user.id):
+    admin_service = context.bot_data["admin_service"]
+    if not admin_service.is_admin(update.message.from_user.id):
         await update.message.reply_text("Unauthorized.")
         return
+
     try:
         new_admin_id = int(context.args[0])
-        if add_admin(new_admin_id):
+        if await admin_service.add_admin(new_admin_id):
             await update.message.reply_text(f"Admin {new_admin_id} added successfully.")
-            # Notify other admins
-            for admin_id in get_admins():
+            for admin_id in admin_service.get_admins():
                 if admin_id != update.message.from_user.id:
                     await context.bot.send_message(
                         chat_id=admin_id,
@@ -42,15 +48,16 @@ async def add_admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def remove_admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Command to remove an admin."""
-    if not is_admin(update.message.from_user.id):
+    admin_service = context.bot_data["admin_service"]
+    if not admin_service.is_admin(update.message.from_user.id):
         await update.message.reply_text("Unauthorized.")
         return
+
     try:
         admin_to_remove_id = int(context.args[0])
-        if remove_admin(admin_to_remove_id):
+        if await admin_service.remove_admin(admin_to_remove_id):
             await update.message.reply_text(f"Admin {admin_to_remove_id} removed successfully.")
-            # Notify other admins
-            for admin_id in get_admins():
+            for admin_id in admin_service.get_admins():
                 if admin_id != update.message.from_user.id:
                     await context.bot.send_message(
                         chat_id=admin_id,
@@ -63,8 +70,9 @@ async def remove_admin_command(update: Update, context: ContextTypes.DEFAULT_TYP
 
 async def send_admin_welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Sends a welcome message to a new admin."""
+    admin_service = context.bot_data["admin_service"]
     user_id = update.message.from_user.id
-    if is_admin(user_id) and user_id not in context.bot_data.get("welcomed_admins", []):
+    if admin_service.is_admin(user_id) and user_id not in context.bot_data.get("welcomed_admins", []):
         welcome_message = """
         Welcome to the Admin Team! / ወደ አስተዳደር ቡድን እንኳን በደህና መጡ!
 
