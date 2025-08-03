@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 
 from src.constants import (
     REGISTER_NAME, REGISTER_FATHER_NAME, REGISTER_PHONE, REGISTER_EDUCATION,
-    REGISTER_OTHER_EDUCATION, REGISTER_DEPARTMENT, REGISTER_USERNAME, REGISTER_ROUND,
+    REGISTER_OTHER_EDUCATION, REGISTER_DEPARTMENT, REGISTER_USERNAME,
     BROADCAST_MESSAGE
 )
 from src.services.admin_service import AdminService
@@ -19,14 +19,14 @@ from src.services.sheet_service import SheetService
 from handlers.start import start
 from handlers.registration import (
     registration_name, registration_father_name, registration_phone, registration_education,
-    registration_other_education, registration_department, registration_username, registration_round,
+    registration_other_education, registration_department, registration_username, registration_finish,
     cancel
 )
 from handlers.payment import payment_upload, payment_approve
 from handlers.admin import admin_view, add_admin_command, remove_admin_command, send_admin_welcome
 from handlers.broadcast import broadcast, send_broadcast, cancel_broadcast
 from handlers.error import error_handler
-from config.config import BOT_TOKEN, GOOGLE_SHEETS_CREDENTIALS, SHEET_ID
+from config.config import BOT_TOKEN, GOOGLE_SHEETS_CREDENTIALS, SHEET_ID, INITIAL_ADMIN_ID
 
 # Set up logging
 logging.basicConfig(
@@ -40,7 +40,7 @@ def main():
     load_dotenv()
 
     # Initialize services
-    admin_service = AdminService()
+    admin_service = AdminService(INITIAL_ADMIN_ID)
     admin_service.load_admins()
     sheet_service = SheetService(GOOGLE_SHEETS_CREDENTIALS, SHEET_ID)
 
@@ -64,8 +64,7 @@ def main():
             ],
             REGISTER_OTHER_EDUCATION: [MessageHandler(filters.TEXT & ~filters.COMMAND, registration_department)],
             REGISTER_DEPARTMENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, registration_username)],
-            REGISTER_USERNAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, registration_round)],
-            REGISTER_ROUND: [MessageHandler(filters.Regex("^(Round 1|Round 2)"), registration_round)],
+            REGISTER_USERNAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, registration_finish)],
         },
         fallbacks=[CommandHandler("cancel", cancel)],
     )

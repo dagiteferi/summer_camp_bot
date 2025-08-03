@@ -2,10 +2,10 @@
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import ContextTypes, ConversationHandler
 from utils.validators import validate_name, validate_phone
-from config.config import PAYMENT_INSTRUCTIONS, PENDING_MESSAGE
+from config.config import PAYMENT_INSTRUCTIONS, PENDING_MESSAGE, ACTIVE_ROUND
 from src.constants import (
     REGISTER_NAME, REGISTER_FATHER_NAME, REGISTER_PHONE, REGISTER_EDUCATION,
-    REGISTER_OTHER_EDUCATION, REGISTER_DEPARTMENT, REGISTER_USERNAME, REGISTER_ROUND
+    REGISTER_OTHER_EDUCATION, REGISTER_DEPARTMENT, REGISTER_USERNAME
 )
 
 async def registration_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -73,33 +73,31 @@ async def registration_username(update: Update, context: ContextTypes.DEFAULT_TY
     username = update.message.from_user.username or ""
     if username:
         context.user_data["registration"]["username"] = username
-        keyboard = [["Round 1 (Grades 9–12)", "Round 2 (Grade 12+)"]]
-        await update.message.reply_text(
-            "Select camp round / የካምፕ ዙር ይምረጡ",
-            reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True)
+        
+        # Finalize registration
+        sheet_service = context.bot_data["sheet_service"]
+        context.user_data["registration"]["round"] = ACTIVE_ROUND
+        sheet_service.save_registration(context.user_data["registration"])
+        await context.bot.send_message(
+            chat_id=update.message.from_user.id,
+            text=PENDING_MESSAGE
         )
-        return REGISTER_ROUND
+        await update.message.reply_text(PAYMENT_INSTRUCTIONS, reply_markup=ReplyKeyboardRemove())
+        return ConversationHandler.END
+
     await update.message.reply_text("Enter your Telegram username / የቴሌግራም ተጠቃሚ ስምዎን ያስገቡ")
     return REGISTER_USERNAME
 
-async def registration_round(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handles username (if provided) and round selection, then finalizes registration."""
-    # If username was not automatically detected, it's provided in this step.
-    if "username" not in context.user_data["registration"]:
-        username = update.message.text
-        if not username.startswith("@"):
-            username = f"@{username}"
-        context.user_data["registration"]["username"] = username
-        keyboard = [["Round 1 (Grades 9–12)", "Round 2 (Grade 12+)"]]
-        await update.message.reply_text(
-            "Select camp round / የካምፕ ዙር ይምረጡ",
-            reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True)
-        )
-        return REGISTER_ROUND
-
-    # Handle round selection
+async def registration_finish(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Saves username and finalizes registration."""
+    username = update.message.text
+    if not username.startswith("@"):
+        username = f"@{username}"
+    context.user_data["registration"]["username"] = username
+    
+    # Finalize registration
     sheet_service = context.bot_data["sheet_service"]
-    context.user_data["registration"]["round"] = update.message.text.split(" ")[0]
+    context.user_data["registration"]["round"] = ACTIVE_ROUND
     sheet_service.save_registration(context.user_data["registration"])
     await context.bot.send_message(
         chat_id=update.message.from_user.id,
@@ -112,3 +110,4 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Cancel the registration process."""
     await update.message.reply_text("Registration cancelled. / ምዝገባ ተሰርዟል።")
     return ConversationHandler.END
+

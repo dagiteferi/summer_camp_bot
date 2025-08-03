@@ -2,17 +2,22 @@ import json
 from src.constants import ADMIN_FILE
 
 class AdminService:
-    def __init__(self):
+    def __init__(self, initial_admin_id=None):
         self._admins = set()
+        self._initial_admin_id = initial_admin_id
 
     def load_admins(self):
-        """Load admin user IDs from the JSON file."""
+        """Load admin user IDs from the JSON file or set the initial admin."""
         try:
             with open(ADMIN_FILE, "r") as f:
                 data = json.load(f)
                 self._admins = set(data.get("admins", []))
         except FileNotFoundError:
             self._admins = set() # No admins yet
+
+        if not self._admins and self._initial_admin_id:
+            self._admins.add(int(self._initial_admin_id))
+            self._save_admins()
 
     def _save_admins(self):
         """Save the current list of admin IDs to the JSON file."""
