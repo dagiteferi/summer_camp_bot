@@ -10,8 +10,7 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 GOOGLE_SHEETS_CREDENTIALS = os.getenv("GOOGLE_SHEETS_CREDENTIALS")  # Path to JSON key file
 SHEET_ID = os.getenv("SHEET_ID")  # Google Sheet ID
 
-# Admin Telegram IDs (add actual admin IDs)
-ADMIN_IDS = [123456789, 987654321]  # Replace with real Telegram user IDs
+
 
 # Bot Messages
 WELCOME_MESSAGE = """

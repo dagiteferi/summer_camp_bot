@@ -2,7 +2,8 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from utils.sheets import save_registration, update_payment_and_membership_status, get_registrations
 from utils.batch import generate_batch_number
-from config.config import SUCCESS_MESSAGE, PENDING_MESSAGE, ADMIN_IDS
+from utils.admin_utils import is_admin, get_admins
+from config.config import SUCCESS_MESSAGE, PENDING_MESSAGE
 
 async def payment_upload(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle payment screenshot upload."""
@@ -11,7 +12,7 @@ async def payment_upload(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not registration:
             await update.message.reply_text("Please register first using /register.")
             return
-        for admin_id in ADMIN_IDS:
+        for admin_id in get_admins():
             await context.bot.send_photo(
                 admin_id,
                 update.message.photo[-1].file_id,

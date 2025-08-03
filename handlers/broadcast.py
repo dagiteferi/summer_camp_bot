@@ -1,13 +1,13 @@
 from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler
-from config.config import ADMIN_IDS
+from utils.admin_utils import is_admin
 from utils.sheets import get_approved_users
 
 BROADCAST_MESSAGE = 0
 
 async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Start broadcast message process."""
-    if update.message.from_user.id not in ADMIN_IDS:
+    if not is_admin(update.message.from_user.id):
         await update.message.reply_text("Unauthorized.")
         return ConversationHandler.END
     await update.message.reply_text("Enter the message to broadcast to all approved users:")
