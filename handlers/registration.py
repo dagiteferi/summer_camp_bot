@@ -5,7 +5,7 @@ from utils.validators import validate_name, validate_phone
 from config.config import PAYMENT_INSTRUCTIONS, PENDING_MESSAGE, ACTIVE_ROUND
 from src.constants import (
     REGISTER_NAME, REGISTER_FATHER_NAME, REGISTER_PHONE, REGISTER_EDUCATION,
-    REGISTER_OTHER_EDUCATION, REGISTER_DEPARTMENT, REGISTER_USERNAME
+    REGISTER_OTHER_EDUCATION, REGISTER_DEPARTMENT
 )
 
 async def registration_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -67,33 +67,10 @@ async def registration_department(update: Update, context: ContextTypes.DEFAULT_
                                    reply_markup=ReplyKeyboardRemove())
     return REGISTER_DEPARTMENT
 
-async def registration_username(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Saves department and asks for username if not auto-detected."""
-    context.user_data["registration"]["department"] = update.message.text
-    username = update.message.from_user.username or ""
-    if username:
-        context.user_data["registration"]["username"] = username
-        
-        # Finalize registration
-        sheet_service = context.bot_data["sheet_service"]
-        context.user_data["registration"]["round"] = ACTIVE_ROUND
-        sheet_service.save_registration(context.user_data["registration"])
-        await context.bot.send_message(
-            chat_id=update.message.from_user.id,
-            text=PENDING_MESSAGE
-        )
-        await update.message.reply_text(PAYMENT_INSTRUCTIONS, reply_markup=ReplyKeyboardRemove())
-        return ConversationHandler.END
-
-    await update.message.reply_text("Enter your Telegram username / የቴሌግራም ተጠቃሚ ስምዎን ያስገቡ")
-    return REGISTER_USERNAME
-
 async def registration_finish(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Saves username and finalizes registration."""
-    username = update.message.text
-    if not username.startswith("@"):
-        username = f"@{username}"
-    context.user_data["registration"]["username"] = username
+    """Saves department and finalizes registration."""
+    context.user_data["registration"]["department"] = update.message.text
+    context.user_data["registration"]["user_id"] = update.message.from_user.id
     
     # Finalize registration
     sheet_service = context.bot_data["sheet_service"]

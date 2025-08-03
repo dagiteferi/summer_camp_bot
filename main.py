@@ -11,15 +11,14 @@ from dotenv import load_dotenv
 
 from src.constants import (
     REGISTER_NAME, REGISTER_FATHER_NAME, REGISTER_PHONE, REGISTER_EDUCATION,
-    REGISTER_OTHER_EDUCATION, REGISTER_DEPARTMENT, REGISTER_USERNAME,
-    BROADCAST_MESSAGE
+    REGISTER_OTHER_EDUCATION, REGISTER_DEPARTMENT, BROADCAST_MESSAGE
 )
 from src.services.admin_service import AdminService
 from src.services.sheet_service import SheetService
 from handlers.start import start
 from handlers.registration import (
     registration_name, registration_father_name, registration_phone, registration_education,
-    registration_other_education, registration_department, registration_username, registration_finish,
+    registration_other_education, registration_department, registration_finish,
     cancel
 )
 from handlers.payment import payment_upload, payment_approve
@@ -63,8 +62,7 @@ def main():
                 MessageHandler(filters.TEXT & ~filters.COMMAND, registration_education),
             ],
             REGISTER_OTHER_EDUCATION: [MessageHandler(filters.TEXT & ~filters.COMMAND, registration_department)],
-            REGISTER_DEPARTMENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, registration_username)],
-            REGISTER_USERNAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, registration_finish)],
+            REGISTER_DEPARTMENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, registration_finish)],
         },
         fallbacks=[CommandHandler("cancel", cancel)],
     )

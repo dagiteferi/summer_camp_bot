@@ -26,7 +26,7 @@ class SheetService:
             data["phone"],
             data["education"],
             data["department"],
-            data["username"],
+            data["user_id"],
             data["round"],
             "Pending",
             "Pending",
@@ -42,9 +42,9 @@ class SheetService:
             return [r for r in records if r["Round"] == round_filter]
         return records
 
-    def update_payment_and_membership_status(self, telegram_id, payment_status, membership_status, batch_number):
+    def update_payment_and_membership_status(self, user_id, payment_status, membership_status, batch_number):
         """Update a user's registration status."""
-        cell = self.sheet.find(telegram_id)
+        cell = self.sheet.find(str(user_id))
         if cell:
             self.sheet.update_cell(cell.row, COLUMNS.index("Payment Status") + 1, payment_status)
             self.sheet.update_cell(cell.row, COLUMNS.index("Membership Status") + 1, membership_status)
@@ -55,4 +55,4 @@ class SheetService:
     def get_approved_users(self):
         """Get all approved users."""
         records = self.sheet.get_all_records()
-        return [r["Telegram Username"] for r in records if r["Payment Status"] == "Approved" and r["Membership Status"] == "Approved"]
+        return [r["Telegram User ID"] for r in records if r["Payment Status"] == "Approved" and r["Membership Status"] == "Approved"]

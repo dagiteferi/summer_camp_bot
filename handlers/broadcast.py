@@ -19,11 +19,11 @@ async def send_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.message.text
     approved_users = sheet_service.get_approved_users()
 
-    for username in approved_users:
+    for user_id in approved_users:
         try:
-            await context.bot.send_message(chat_id=username, text=message)
+            await context.bot.send_message(chat_id=user_id, text=message)
         except Exception as e:
-            await update.message.reply_text(f"Failed to send to {username}: {str(e)}")
+            await update.message.reply_text(f"Failed to send to {user_id}: {str(e)}")
 
     await update.message.reply_text("Broadcast sent to all approved users.")
     return ConversationHandler.END
