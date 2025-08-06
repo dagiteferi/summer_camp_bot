@@ -23,7 +23,7 @@ from handlers.registration import (
     back_to_department,
     cancel
 )
-from handlers.payment import payment_upload, payment_approve
+
 from handlers.admin import admin_view, add_admin_command, remove_admin_command, send_admin_welcome
 from handlers.broadcast import broadcast, send_broadcast, cancel_broadcast
 from handlers.error import error_handler
@@ -54,7 +54,7 @@ def main():
 
     # Conversation handler for registration
     registration_handler = ConversationHandler(
-        entry_points=[CommandHandler("register", registration_name), CallbackQueryHandler("register", registration_name)],
+        entry_points=[CommandHandler("register", registration_name), CallbackQueryHandler(pattern="register", callback=registration_name)],
         states={
             RegistrationStates.REGISTER_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, registration_father_name)],
             RegistrationStates.REGISTER_FATHER_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, registration_phone)],
