@@ -1,5 +1,6 @@
 import os
 import logging
+from telegram import Update
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -9,6 +10,7 @@ from telegram.ext import (
     filters,
 )
 from dotenv import load_dotenv
+from flask import Flask, request, json
 
 from src.states import RegistrationStates
 from src.constants import BROADCAST_MESSAGE
@@ -27,13 +29,16 @@ from handlers.registration import (
 from handlers.admin import admin_view, add_admin_command, remove_admin_command, send_admin_welcome
 from handlers.broadcast import broadcast, send_broadcast, cancel_broadcast
 from handlers.error import error_handler
-from config.config import BOT_TOKEN, GOOGLE_SHEETS_CREDENTIALS, SHEET_ID, INITIAL_ADMIN_ID
+from config.config import BOT_TOKEN, GOOGLE_SHEETS_CREDENTIALS, SHEET_ID, INITIAL_ADMIN_ID, WEBHOOK_URL
 
 # Set up logging
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 logger = logging.getLogger(__name__)
+
+# Initialize Flask app
+app = Flask(__name__)
 
 def main():
     """Main function to run the Telegram bot."""
@@ -94,8 +99,22 @@ def main():
     
     application.add_error_handler(error_handler)
 
-    # Start the bot
-    application.run_polling(allowed_updates=["message", "callback_query"])
+    # Set up webhook
+    @app.route('/webhook', methods=['POST'])
+    async def webhook_handler():
+        """Set up webhook for the bot."""
+        if request.method == "POST":
+            update = Update.de_json(request.get_json(force=True), application.bot)
+            await application.process_update(update)
+        return "ok"
+
+    # Run the bot
+    application.run_webhook(
+        listen="0.0.0.0",
+        port=int(os.environ.get("PORT", "8443")),
+        url_path="/webhook",
+        webhook_url=WEBHOOK_URL
+    )
 
 if __name__ == "__main__":
     main()

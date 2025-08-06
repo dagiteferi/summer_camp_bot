@@ -13,6 +13,9 @@ SHEET_ID = os.getenv("SHEET_ID")  # Google Sheet ID
 # Initial Admin ID
 INITIAL_ADMIN_ID = os.getenv("INITIAL_ADMIN_ID")
 
+# Webhook URL for deployment
+WEBHOOK_URL = os.getenv("WEBHOOK_URL")
+
 # Active round
 ACTIVE_ROUND = "Round 1"
 
