@@ -45,22 +45,20 @@ class SheetService:
             return [r for r in records if r["Round"] == round_filter]
         return records
 
-    def update_payment_and_membership_status(self, user_id, payment_status, membership_status, batch_number):
+    def update_payment_and_membership_status(self, user_id, payment_status, membership_status):
         """Update a user's registration status."""
         cell = self.sheet.find(str(user_id))
         if cell:
             self.sheet.update_cell(cell.row, COLUMNS.index("Payment Status") + 1, payment_status)
             self.sheet.update_cell(cell.row, COLUMNS.index("Membership Status") + 1, membership_status)
-            self.sheet.update_cell(cell.row, COLUMNS.index("Batch Number") + 1, batch_number)
             return True
         return False
 
-    def update_payment_status(self, user_id, payment_status, batch_number):
+    def update_payment_status(self, user_id, payment_status):
         """Update a user's payment status."""
         cell = self.sheet.find(str(user_id))
         if cell:
             self.sheet.update_cell(cell.row, COLUMNS.index("Payment Status") + 1, payment_status)
-            self.sheet.update_cell(cell.row, COLUMNS.index("Batch Number") + 1, batch_number)
             return True
         return False
 

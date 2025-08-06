@@ -88,10 +88,10 @@ def main():
     application.add_handler(registration_handler)
     application.add_handler(broadcast_handler)
     application.add_handler(CommandHandler("admin_view", admin_view))
-    application.add_handler(CommandHandler("approve", payment_approve))
+    
     application.add_handler(CommandHandler("add_admin", add_admin_command))
     application.add_handler(CommandHandler("remove_admin", remove_admin_command))
-    application.add_handler(MessageHandler(filters.PHOTO, payment_upload))
+    
     application.add_error_handler(error_handler)
 
     # Start the bot

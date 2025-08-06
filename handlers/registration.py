@@ -2,7 +2,7 @@
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardRemove
 from telegram.ext import ContextTypes, ConversationHandler
 from utils.validators import validate_name, validate_phone
-from config.config import PAYMENT_INSTRUCTIONS, PENDING_MESSAGE, ACTIVE_ROUND
+from config.config import ACTIVE_ROUND
 from src.states import RegistrationStates
 
 async def registration_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -117,20 +117,7 @@ async def registration_finish(update: Update, context: ContextTypes.DEFAULT_TYPE
         sheet_service = context.bot_data["sheet_service"]
         context.user_data["registration"]["round"] = ACTIVE_ROUND
         sheet_service.save_registration(context.user_data["registration"])
-        await query.edit_message_text("Registration successful!")
-        try:
-            await context.bot.send_message(
-                chat_id=update.callback_query.from_user.id,
-                text=PENDING_MESSAGE
-            )
-            await context.bot.send_message(
-                chat_id=update.callback_query.from_user.id,
-                text=PAYMENT_INSTRUCTIONS
-            )
-        except Exception:
-            await query.message.reply_text(
-                f"{PENDING_MESSAGE}\n\n{PAYMENT_INSTRUCTIONS}\n\nTo receive future messages, please start a private chat with me."
-            )
+        await query.edit_message_text("Congratulations! You have successfully registered for the summer camp.")
     else:
         await query.edit_message_text("Registration cancelled. / ምዝገባ ተሰрዟል።")
     return ConversationHandler.END

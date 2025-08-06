@@ -34,22 +34,5 @@ Instagram: https://www.instagram.com/adama_fullgospel_youth__/
 
 """
 
-# Payment Instructions
-PAYMENT_INSTRUCTIONS = """To complete your registration, please pay 400 Birr to the following bank account:
 
-[Bank Account Details]
 
-After paying, please send a screenshot of your payment to this chat."""
-
-# Pending Message
-PENDING_MESSAGE = """Congratulations! You have successfully registered for the summer camp.
-
-Your registration is now pending payment. You will receive a batch number once your payment is approved."""
-
-# Success Message
-SUCCESS_MESSAGE = """
-🎉 Registration successful! / ምዝገባዎ ተሳክቷል!
-Batch Number: {batch_number}
-Prepare for camp starting Nehase 6! Bring comfortable clothes and a Bible.
-ካምፑ ነሀሴ 6 ይጀምራል! ምቹ ልብስ እና መጽሐፍ ቅዱስ ይዘው ይምጡ።
-"""
