@@ -3,54 +3,59 @@ from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, ReplyKe
 from telegram.ext import ContextTypes, ConversationHandler
 from utils.validators import validate_name, validate_phone
 from config.config import PAYMENT_INSTRUCTIONS, PENDING_MESSAGE, ACTIVE_ROUND
-from src.constants import (
-    REGISTER_NAME, REGISTER_FATHER_NAME, REGISTER_PHONE, REGISTER_EDUCATION,
-    REGISTER_OTHER_EDUCATION, REGISTER_DEPARTMENT, REGISTER_CONFIRMATION
-)
+from src.states import RegistrationStates
 
 async def registration_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Start registration and ask for name."""
+    user_id = update.message.from_user.id
+    sheet_service = context.bot_data["sheet_service"]
+    if sheet_service.is_user_registered(user_id):
+        await update.message.reply_text(
+            "You are already registered. / አስቀድመው ተመዝግበዋል።"
+        )
+        return ConversationHandler.END
+
     context.user_data["registration"] = {}
     await update.message.reply_text("Please enter your name / ስምዎን ያስገቡ")
-    return REGISTER_NAME
+    return RegistrationStates.REGISTER_NAME
 
 async def registration_father_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Ask for father's name."""
     name = update.message.text
     if not validate_name(name):
         await update.message.reply_text("Invalid name. Use letters only. / ስም ተገቢ አይደለም። ፊደሎችን ብቻ ይጠቀሙ።")
-        return REGISTER_NAME
+        return RegistrationStates.REGISTER_NAME
     context.user_data["registration"]["name"] = name
     await update.message.reply_text("Please enter your father's name / የአባትዎን ስም ያስገቡ")
-    return REGISTER_FATHER_NAME
+    return RegistrationStates.REGISTER_FATHER_NAME
 
 async def registration_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Ask for phone number."""
     father_name = update.message.text
     if not validate_name(father_name):
         await update.message.reply_text("Invalid father's name. Use letters only. / የአባት ስም ተገቢ አይደለም።")
-        return REGISTER_FATHER_NAME
+        return RegistrationStates.REGISTER_FATHER_NAME
     context.user_data["registration"]["father_name"] = father_name
     await update.message.reply_text("Please enter your phone number / ስልክ ቁጥርዎን ያስገቡ")
-    return REGISTER_PHONE
+    return RegistrationStates.REGISTER_PHONE
 
 async def registration_education(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Ask for education level."""
     phone = update.message.text
     if not validate_phone(phone):
         await update.message.reply_text("Invalid phone number. Use +251 or 0 followed by 9 digits. / ስልክ ቁጥር ተገቢ አይደለም።")
-        return REGISTER_PHONE
+        return RegistrationStates.REGISTER_PHONE
     context.user_data["registration"]["phone"] = phone
     keyboard = [
         [InlineKeyboardButton("ወደ 12", callback_data="ወደ 12"), InlineKeyboardButton("9ኛ ክፍል", callback_data="9ኛ ክፍል")],
         [InlineKeyboardButton("10ኛ ክፍል", callback_data="10ኛ ክፍል"), InlineKeyboardButton("11ኛ ክፍል", callback_data="11ኛ ክፍል")],
-        [InlineKeyboardButton("Other", callback_data="Other")]
+        [InlineKeyboardButton("Other", callback_data="Other"), InlineKeyboardButton("Back", callback_data="back_to_phone")]
     ]
     await update.message.reply_text(
         "Select your education level / የትምህርት ሁኔታዎን ይምረጡ",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
-    return REGISTER_EDUCATION
+    return RegistrationStates.REGISTER_EDUCATION
 
 async def registration_other_education(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle education level selection."""
@@ -59,17 +64,31 @@ async def registration_other_education(update: Update, context: ContextTypes.DEF
     education = query.data
     if education == "Other":
         await query.edit_message_text("Please specify your education level / የትምህርት ሁኔታዎን ይግለጹ")
-        return REGISTER_OTHER_EDUCATION
+        return RegistrationStates.REGISTER_OTHER_EDUCATION
     context.user_data["registration"]["education"] = education
-    await query.edit_message_text("Enter your serving department / የሚያገለግሉበት ሄበርት ያስገቡ")
-    return REGISTER_DEPARTMENT
+    await query.edit_message_text("Enter your serving department / የሚያገለግሉበት ህብረት ያስገቡ")
+    return RegistrationStates.REGISTER_DEPARTMENT
 
 async def registration_department(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Saves custom education and asks for serving department."""
     if "education" not in context.user_data["registration"]:
         context.user_data["registration"]["education"] = update.message.text
-    await update.message.reply_text("Enter your serving department / የሚያገለግሉበት ሄበርት ያስገቡ")
-    return REGISTER_DEPARTMENT
+    await update.message.reply_text("Enter your serving department / የሚያገለግሉበት ህብረት ያስገቡ")
+    return RegistrationStates.REGISTER_DEPARTMENT
+
+async def back_to_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Go back to the phone number entry step."""
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text("Please enter your phone number / ስልክ ቁጥርዎን ያስገቡ")
+    return RegistrationStates.REGISTER_PHONE
+
+async def back_to_department(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Go back to the department entry step."""
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text("Enter your serving department / የሚያገለግሉበት ህብረት ያስገቡ")
+    return RegistrationStates.REGISTER_DEPARTMENT
 
 async def registration_confirmation(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Ask for confirmation of the provided information."""
@@ -83,10 +102,11 @@ Phone: {reg_data['phone']}
 Education: {reg_data['education']}
 Department: {reg_data['department']}"""
     keyboard = [
-        [InlineKeyboardButton("Confirm", callback_data="confirm"), InlineKeyboardButton("Cancel", callback_data="cancel")]
+        [InlineKeyboardButton("Confirm", callback_data="confirm"), InlineKeyboardButton("Cancel", callback_data="cancel")],
+        [InlineKeyboardButton("Back", callback_data="back_to_department")]
     ]
     await update.message.reply_text(summary, reply_markup=InlineKeyboardMarkup(keyboard))
-    return REGISTER_CONFIRMATION
+    return RegistrationStates.REGISTER_CONFIRMATION
 
 async def registration_finish(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Saves department and finalizes registration."""

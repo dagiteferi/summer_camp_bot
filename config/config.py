@@ -18,17 +18,19 @@ ACTIVE_ROUND = "Round 1"
 
 # Bot Messages
 WELCOME_MESSAGE = """
-Summer Camp Registration / የበጋ ካምፕ ምዝገባ
+Summer Camp Registration /  ካምፕ ምዝገባ
 This summer camp is organized by Adama Gende Gara Full Gospel Church.
 ይህ summer camp በአዳማ ገንደ ጋራ ሙሉ ወንጌል ቤተክርስቲያን ተዘጋጅቷል
 📌 Round 1: For church members in Grades 9–12.
-📌 የመጀመሪያ ዙር፡ ለቤተክርስቲያን አባላት ከ9–12 ክፍል።
+📌 የመጀመሪያ ዙር፡ ከ9–12 ክፍል።
 📌 Round 2: For church members in Grade 12 and above.
-📌 የሁለተኛ ዙር፡ ለቤተክርስቲያን አባላት ከ12ኛ ክፍል በላይ።
-Starts Nehase 6 / ነሀሴ 6 ይጀምራል
+📌 የሁለተኛ ዙር፡  ከ12ኛ ክፍል በላይ።
+
 Follow us:
-Telegram: t.me/yourchurch
-Instagram: instagram.com/yourchurch
+Telegram: https://t.me/Sacred_Youth
+Instagram: https://www.instagram.com/adama_fullgospel_youth__/
+
+
 Use /register to start registration.
 """
 

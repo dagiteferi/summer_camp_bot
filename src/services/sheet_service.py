@@ -73,3 +73,11 @@ class SheetService:
         """Get all user IDs."""
         records = self.sheet.get_all_records()
         return [r["Telegram User ID"] for r in records]
+
+    def is_user_registered(self, user_id):
+        """Check if a user is already registered."""
+        try:
+            self.sheet.find(str(user_id))
+            return True
+        except gspread.exceptions.CellNotFound:
+            return False

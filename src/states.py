@@ -1,0 +1,10 @@
+from enum import Enum
+
+class RegistrationStates(Enum):
+    REGISTER_NAME = 1
+    REGISTER_FATHER_NAME = 2
+    REGISTER_PHONE = 3
+    REGISTER_EDUCATION = 4
+    REGISTER_OTHER_EDUCATION = 5
+    REGISTER_DEPARTMENT = 6
+    REGISTER_CONFIRMATION = 7
