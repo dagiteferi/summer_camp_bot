@@ -31,7 +31,7 @@ Telegram: https://t.me/Sacred_Youth
 Instagram: https://www.instagram.com/adama_fullgospel_youth__/
 
 
-Use /register to start registration.
+
 """
 
 # Payment Instructions
