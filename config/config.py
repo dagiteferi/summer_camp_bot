@@ -33,18 +33,16 @@ Use /register to start registration.
 """
 
 # Payment Instructions
-PAYMENT_INSTRUCTIONS = """
-Please transfer 400 ETB to [Bank Account Details].
-Upload a screenshot or photo of your payment to complete registration.
-እባክዎ 400 ብር ወደ [የባንክ መለያ ዝርዝር] ያስተላልፉ።
-ምዝገባዎን ለመጨረስ የክፍያ ማረጋገጫ ፎቶ ይስቀሉ።
-"""
+PAYMENT_INSTRUCTIONS = """To complete your registration, please pay 400 Birr to the following bank account:
+
+[Bank Account Details]
+
+After paying, please send a screenshot of your payment to this chat."""
 
 # Pending Message
-PENDING_MESSAGE = """
-Your registration is pending approval. You will receive a batch number once your payment and membership are verified.
-ምዝገባዎ ማፅደቂያ እስኪያገኝ ድረስ በጥበቃ ላይ ነው። ክፍያዎ እና የአባልነት ማረጋገጫዎ ከተረጋገጠ በኋላ የባች ቁጥር ይደርስዎታል።
-"""
+PENDING_MESSAGE = """Congratulations! You have successfully registered for the summer camp.
+
+Your registration is now pending payment. You will receive a batch number once your payment is approved."""
 
 # Success Message
 SUCCESS_MESSAGE = """

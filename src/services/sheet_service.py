@@ -55,7 +55,21 @@ class SheetService:
             return True
         return False
 
+    def update_payment_status(self, user_id, payment_status, batch_number):
+        """Update a user's payment status."""
+        cell = self.sheet.find(str(user_id))
+        if cell:
+            self.sheet.update_cell(cell.row, COLUMNS.index("Payment Status") + 1, payment_status)
+            self.sheet.update_cell(cell.row, COLUMNS.index("Batch Number") + 1, batch_number)
+            return True
+        return False
+
     def get_approved_users(self):
         """Get all approved users."""
         records = self.sheet.get_all_records()
         return [r["Telegram User ID"] for r in records if r["Payment Status"] == "Approved" and r["Membership Status"] == "Approved"]
+
+    def get_all_user_ids(self):
+        """Get all user IDs."""
+        records = self.sheet.get_all_records()
+        return [r["Telegram User ID"] for r in records]

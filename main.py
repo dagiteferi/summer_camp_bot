@@ -5,13 +5,15 @@ from telegram.ext import (
     CommandHandler,
     ConversationHandler,
     MessageHandler,
+    CallbackQueryHandler,
     filters,
 )
 from dotenv import load_dotenv
 
 from src.constants import (
     REGISTER_NAME, REGISTER_FATHER_NAME, REGISTER_PHONE, REGISTER_EDUCATION,
-    REGISTER_OTHER_EDUCATION, REGISTER_DEPARTMENT, BROADCAST_MESSAGE
+    REGISTER_OTHER_EDUCATION, REGISTER_DEPARTMENT, BROADCAST_MESSAGE,
+    REGISTER_CONFIRMATION
 )
 from src.services.admin_service import AdminService
 from src.services.sheet_service import SheetService
@@ -19,6 +21,7 @@ from handlers.start import start
 from handlers.registration import (
     registration_name, registration_father_name, registration_phone, registration_education,
     registration_other_education, registration_department, registration_finish,
+    registration_confirmation,
     cancel
 )
 from handlers.payment import payment_upload, payment_approve
@@ -57,12 +60,10 @@ def main():
             REGISTER_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, registration_father_name)],
             REGISTER_FATHER_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, registration_phone)],
             REGISTER_PHONE: [MessageHandler(filters.TEXT & ~filters.COMMAND, registration_education)],
-            REGISTER_EDUCATION: [
-                MessageHandler(filters.Regex("^(ወደ 12|9ኛ ክፍል|10ኛ ክፍል|11ኛ ክፍል|Other)$|"), registration_other_education),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, registration_education),
-            ],
+            REGISTER_EDUCATION: [CallbackQueryHandler(registration_other_education)],
             REGISTER_OTHER_EDUCATION: [MessageHandler(filters.TEXT & ~filters.COMMAND, registration_department)],
-            REGISTER_DEPARTMENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, registration_finish)],
+            REGISTER_DEPARTMENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, registration_confirmation)],
+            REGISTER_CONFIRMATION: [CallbackQueryHandler(registration_finish)],
         },
         fallbacks=[CommandHandler("cancel", cancel)],
     )
