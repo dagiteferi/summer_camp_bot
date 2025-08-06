@@ -11,6 +11,7 @@ from telegram.ext import (
 from dotenv import load_dotenv
 
 from src.states import RegistrationStates
+from src.constants import BROADCAST_MESSAGE
 from src.services.admin_service import AdminService
 from src.services.sheet_service import SheetService
 from handlers.start import start
@@ -59,126 +60,14 @@ def main():
             RegistrationStates.REGISTER_FATHER_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, registration_phone)],
             RegistrationStates.REGISTER_PHONE: [MessageHandler(filters.TEXT & ~filters.COMMAND, registration_education)],
             RegistrationStates.REGISTER_EDUCATION: [
-                CallbackQueryHandler(registration_other_education, pattern='^(?!back_to_phone$).*
-
-    # Conversation handler for broadcast
-    broadcast_handler = ConversationHandler(
-        entry_points=[CommandHandler("broadcast", broadcast)],
-        states={
-            BROADCAST_MESSAGE: [MessageHandler(filters.TEXT & ~filters.COMMAND, send_broadcast)],
-        },
-        fallbacks=[CommandHandler("cancel", cancel_broadcast)],
-    )
-
-    # Add handlers
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("admin_welcome", send_admin_welcome))
-    application.add_handler(registration_handler)
-    application.add_handler(broadcast_handler)
-    application.add_handler(CommandHandler("admin_view", admin_view))
-    application.add_handler(CommandHandler("approve", payment_approve))
-    application.add_handler(CommandHandler("add_admin", add_admin_command))
-    application.add_handler(CommandHandler("remove_admin", remove_admin_command))
-    application.add_handler(MessageHandler(filters.PHOTO, payment_upload))
-    application.add_error_handler(error_handler)
-
-    # Start the bot
-    application.run_polling(allowed_updates=["message", "callback_query"])
-
-if __name__ == "__main__":
-    main()
-),
-                CallbackQueryHandler(back_to_phone, pattern='^back_to_phone
-
-    # Conversation handler for broadcast
-    broadcast_handler = ConversationHandler(
-        entry_points=[CommandHandler("broadcast", broadcast)],
-        states={
-            BROADCAST_MESSAGE: [MessageHandler(filters.TEXT & ~filters.COMMAND, send_broadcast)],
-        },
-        fallbacks=[CommandHandler("cancel", cancel_broadcast)],
-    )
-
-    # Add handlers
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("admin_welcome", send_admin_welcome))
-    application.add_handler(registration_handler)
-    application.add_handler(broadcast_handler)
-    application.add_handler(CommandHandler("admin_view", admin_view))
-    application.add_handler(CommandHandler("approve", payment_approve))
-    application.add_handler(CommandHandler("add_admin", add_admin_command))
-    application.add_handler(CommandHandler("remove_admin", remove_admin_command))
-    application.add_handler(MessageHandler(filters.PHOTO, payment_upload))
-    application.add_error_handler(error_handler)
-
-    # Start the bot
-    application.run_polling(allowed_updates=["message", "callback_query"])
-
-if __name__ == "__main__":
-    main()
-)
+                CallbackQueryHandler(registration_other_education, pattern='^(?!back_to_phone$).*$'),
+                CallbackQueryHandler(back_to_phone, pattern='^back_to_phone$')
             ],
             RegistrationStates.REGISTER_OTHER_EDUCATION: [MessageHandler(filters.TEXT & ~filters.COMMAND, registration_department)],
             RegistrationStates.REGISTER_DEPARTMENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, registration_confirmation)],
             RegistrationStates.REGISTER_CONFIRMATION: [
-                CallbackQueryHandler(registration_finish, pattern='^(?!back_to_department$).*
-
-    # Conversation handler for broadcast
-    broadcast_handler = ConversationHandler(
-        entry_points=[CommandHandler("broadcast", broadcast)],
-        states={
-            BROADCAST_MESSAGE: [MessageHandler(filters.TEXT & ~filters.COMMAND, send_broadcast)],
-        },
-        fallbacks=[CommandHandler("cancel", cancel_broadcast)],
-    )
-
-    # Add handlers
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("admin_welcome", send_admin_welcome))
-    application.add_handler(registration_handler)
-    application.add_handler(broadcast_handler)
-    application.add_handler(CommandHandler("admin_view", admin_view))
-    application.add_handler(CommandHandler("approve", payment_approve))
-    application.add_handler(CommandHandler("add_admin", add_admin_command))
-    application.add_handler(CommandHandler("remove_admin", remove_admin_command))
-    application.add_handler(MessageHandler(filters.PHOTO, payment_upload))
-    application.add_error_handler(error_handler)
-
-    # Start the bot
-    application.run_polling(allowed_updates=["message", "callback_query"])
-
-if __name__ == "__main__":
-    main()
-),
-                CallbackQueryHandler(back_to_department, pattern='^back_to_department
-
-    # Conversation handler for broadcast
-    broadcast_handler = ConversationHandler(
-        entry_points=[CommandHandler("broadcast", broadcast)],
-        states={
-            BROADCAST_MESSAGE: [MessageHandler(filters.TEXT & ~filters.COMMAND, send_broadcast)],
-        },
-        fallbacks=[CommandHandler("cancel", cancel_broadcast)],
-    )
-
-    # Add handlers
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("admin_welcome", send_admin_welcome))
-    application.add_handler(registration_handler)
-    application.add_handler(broadcast_handler)
-    application.add_handler(CommandHandler("admin_view", admin_view))
-    application.add_handler(CommandHandler("approve", payment_approve))
-    application.add_handler(CommandHandler("add_admin", add_admin_command))
-    application.add_handler(CommandHandler("remove_admin", remove_admin_command))
-    application.add_handler(MessageHandler(filters.PHOTO, payment_upload))
-    application.add_error_handler(error_handler)
-
-    # Start the bot
-    application.run_polling(allowed_updates=["message", "callback_query"])
-
-if __name__ == "__main__":
-    main()
-)
+                CallbackQueryHandler(registration_finish, pattern='^(?!back_to_department$).*$'),
+                CallbackQueryHandler(back_to_department, pattern='^back_to_department$')
             ],
         },
         fallbacks=[CommandHandler("cancel", cancel)],
